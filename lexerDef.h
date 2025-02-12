@@ -80,12 +80,30 @@ typedef struct Token {
     char* LEXEME;
     int LINE_NO;
 
-    // Stores 0 if not a number, 1 if an integer, 2 if a real number
-    // Also used to segregate lexical errors,
-    // 3 to denote an error when token identification fails,
-    // 4 to denote an error if the token is identified but does not respect the constraints
-    // 5 to denote an error if two identifiers are declared back to back
-    // 6 to denote an unknown symbol
+    // Lexical Error Codes:
+    // 0: Not a number
+    // 1: Integer
+    // 2: Real Number
+    // 3: Token identification fails
+    // 4: Token identified, but constraints violated
+    // 5: Two identifiers declared back-to-back
+    // 6: Unknown symbol (starting point)
+    // 7: Invalid character in identifier
+    // 8: Identifier exceeds maximum length
+    // 9: Unterminated string literal
+    // 10: Invalid escape sequence in string literal
+    // 11: Numeric constant exceeds maximum value
+    // 12: Ill-formed floating-point constant (e.g., multiple decimal points)
+    // 13: Invalid exponent format in floating-point number
+    // 14: Missing digits after decimal point
+    // 15: Symbol sequence is close to a valid token but incorrect (e.g., "<-" instead of "<--")
+    // 16: Invalid Unicode character
+    // 17: Unexpected end-of-file (EOF) within a literal or comment
+    // 18: Zero length identifier
+    // 19: Invalid character at start of number (e.g. `a123`)
+    // 20: End of line in string literal
+    // 21: Comment not closed
+
     int IS_NUMBER;
 
     Value* VALUE; // Stores NULL if the Token is not a number
