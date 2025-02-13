@@ -107,6 +107,6 @@ typedef struct Token {
     int IS_NUMBER;
 
     Value* VALUE; // Stores NULL if the Token is not a number
-} Token;
+} tokenInfo;
 
 #endif
