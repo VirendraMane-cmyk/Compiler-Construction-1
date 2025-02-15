@@ -34,7 +34,12 @@ FILE *getStream(FILE *fp)
  * additional token types can be added as needed.
  */
 
- int matchChar(char ch, char chToEqual) {
+int checkInRange(char ch,char start, char end) {
+    if(ch >= start && ch <= end)
+        return 1;
+    return 0;
+}
+ int checkSingleChar(char ch, char chToEqual) {
     if(ch == chToEqual)
         return 1;
     return 0;
@@ -66,8 +71,17 @@ tokenInfo getNextToken(twinBuffer *B)
         {
             case 0: // Start state
             if(isalpha(c)){
-                if(matchChar(c,'<')){
+                if(checkSingleChar(c,'<')){
                     state = 36;
+                }
+                else if(checkSingleChar(c,'#')){
+                    state = 52;
+                }
+                else if(checkInRange(c,'b','d')){
+                    state = 35;
+                }
+                else if(checkSingleChar(c,'a') || checkInRange(c,'e','z')){
+                    state=40;
                 }
             }
         }
