@@ -340,9 +340,88 @@ tokenInfo getNextToken(twinBuffer *B)
                     state = 18;
                 }
                 else{
-                    
+                    //Double retract and recognize the symbols < and - seperately 
+                    retract(1, B);
+                    /* Now produce the token for '<'. We assume TK_LT is the token for '<'. */
+                    char* lex = copyString(B->lexemeBegin, B->lexemeBegin + 1);
+                    token = createToken(TK_LT, lex, B->lineNumber, 0, NULL);
+                    /* Advance the pointer past the '<' and update lexemeBegin */
+                    B->forward = B->lexemeBegin + 1;
+                    accept(B);
+                    return token;
                 }
+                break;
             }
+            case 18 : {
+                c = B->forward;
+                if(c == '-'){
+                    state = 19;
+                }
+                else{
+                    //Double retract
+                    //HOPE THIS WORKS
+                    //PLEASE WORK 
+                    retract(1,B);
+                    retract(1,B);
+                    char* lex = copyString(B->lexemeBegin,B->lexemeBegin + 1);
+                    token = createToken(TK_LT, lex, B->lineNumber, 0, NULL);
+                    B->forward = B->lexemeBegin + 1;
+                    accept(B);
+
+                    return token;
+                }
+                break;
+            }
+            case 19 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_ASSIGNOP,lex,line_no,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 20 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_LE,lex,line_no,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 21 : {
+                retract(1,B);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_LT,lex,line_no,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 22 : {
+                c = B->forward;
+                if(c == '=') {
+                    state = 23;
+                }
+                else {
+                    state = 24;
+                }
+                break;
+            }
+            case 23 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_GE,lex,line_no,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 24 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_GT,lex,line_no,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 25 : {
+                c = B->forward;
+            }
+
 
         }
     }
