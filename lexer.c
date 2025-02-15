@@ -146,10 +146,24 @@ tokenInfo getNextToken(twinBuffer *B)
                 else if(checkInRange(c,'0','9')){
                     state=42;
                 }
-                else if(checkSingleChar(c,';')){
-                    state=8;
+                else if(checkSingleChar(c,'') || checkSingleChar(c, '\f') || checkSingleChar(c,'\t') || checkSingleChar(c,'\v')) {
+                    lexemeBegin++;
+                    state=0;
                 }
-                else if(single)
+                else if(checkSingleChar(c,'\n')) {
+                    lexemeBegin++;
+                    state=0;
+                }
+                else if(checkSingleChar(c,EOF)) {
+                    return NULL;
+                }
+                else {
+                    printf("Line %d : Invalid Character -> %c \n", lineNumber,c);
+                    errorType = 6;
+                    state = 100
+                    //Random Undefined State dala hai abhi ke liye - Shashwat
+                }
+                break;
             }
         }
     }
