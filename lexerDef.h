@@ -114,17 +114,14 @@ typedef struct Token {
 
 int line_no;
 
-typedef struct {
-    char buffer1[BUFFER_SIZE + 1];  // First buffer
-    char buffer2[BUFFER_SIZE + 1];  // Second buffer (not actively used here)
-    char *forward;       // Pointer to the current character in the active buffer
-    int currentBuffer;   // 1 indicates buffer1, 2 indicates buffer2
-    FILE *fp;            // Source file pointer
-    int lineNumber;      // Current line number for error reporting
-} twinBuffer;
-
-twinBuffer TB;
-
-   
+typedef struct twinBuffer {  
+    char buffer1[BUFFER_SIZE];  // First half of the buffer  
+    char buffer2[BUFFER_SIZE];  // Second half of the buffer  
+    int lexemeBegin;          // Pointer to the beginning of the lexeme  
+    int forward;              // Pointer to the current character being analyzed  
+} twinBuffer;  
+int num_of_rounds;
+int line_no;
+int state;
 
 #endif
