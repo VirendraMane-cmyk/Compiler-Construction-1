@@ -33,16 +33,22 @@ FILE *getStream(FILE *fp)
  * This is a rough implementation; error handling, buffer switching, and
  * additional token types can be added as needed.
  */
+
+ int matchChar(char ch, char chToEqual) {
+    if(ch == chToEqual)
+        return 1;
+    return 0;
+}
 tokenInfo getNextToken(twinBuffer *B)
 {
     tokenInfo token;
-    token.lineNumber = B->lineNumber;
+    token.LINE_NO = B->lineNumber;
     int tokenIndex = 0;
     int state = 0; // DFA initial state
     char c;
 
     // Clear the lexeme buffer.
-    memset(token.lexeme, 0, sizeof(token.lexeme));
+    memset(token.LEXEME, 0, sizeof(token.LEXEME));
 
     // Skip whitespace and update line numbers.
     while (isspace(*B->forward))
@@ -58,84 +64,12 @@ tokenInfo getNextToken(twinBuffer *B)
         c = *B->forward;
         switch (state)
         {
-        case 0: // Start state
-            if (isalpha(c))
-            {
-                token.lexeme[tokenIndex++] = c;
-                state = 1; // Transition to identifier state.
-                B->forward++;
+            case 0: // Start state
+            if(isalpha(c)){
+                if(matchChar(c,'<')){
+                    state = 36;
+                }
             }
-            else if (isdigit(c))
-            {
-                token.lexeme[tokenIndex++] = c;
-                state = 2; // Transition to number state.
-                B->forward++;
-            }
-            else if (c == '+')
-            {
-                token.lexeme[tokenIndex++] = c;
-                token.lexeme[tokenIndex] = '\0';
-                token.tokenType = TOKEN_OPERATOR;
-                B->forward++;
-                return token;
-            }
-            else if (c == '-')
-            {
-                token.lexeme[tokenIndex++] = c;
-                token.lexeme[tokenIndex] = '\0';
-                token.tokenType = TOKEN_OPERATOR;
-                B->forward++;
-                return token;
-            }
-            else if (c == '\0')
-            { // End-of-file or end-of-buffer.
-                token.tokenType = TOKEN_EOF;
-                strcpy(token.lexeme, "EOF");
-                return token;
-            }
-            else
-            {
-                // For any other character, simply return it as an operator for now.
-                token.lexeme[tokenIndex++] = c;
-                token.lexeme[tokenIndex] = '\0';
-                token.tokenType = TOKEN_OPERATOR;
-                B->forward++;
-                return token;
-            }
-            break;
-
-        case 1: // Identifier state.
-            if (isalnum(c))
-            {
-                token.lexeme[tokenIndex++] = c;
-                B->forward++;
-            }
-            else
-            {
-                token.lexeme[tokenIndex] = '\0';
-                token.tokenType = TOKEN_IDENTIFIER;
-                return token;
-            }
-            break;
-
-        case 2: // Number state.
-            if (isdigit(c))
-            {
-                token.lexeme[tokenIndex++] = c;
-                B->forward++;
-            }
-            else
-            {
-                token.lexeme[tokenIndex] = '\0';
-                token.tokenType = TOKEN_NUMBER;
-                return token;
-            }
-            break;
-
-        default:
-            token.tokenType = TOKEN_ERROR;
-            strcpy(token.lexeme, "Unknown token");
-            return token;
         }
     }
 }
