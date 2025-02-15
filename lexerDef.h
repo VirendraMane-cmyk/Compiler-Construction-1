@@ -4,10 +4,13 @@ Vishnu Chebolu                              2022A7PS0124P
 Shashwat Goyal                              2022A7PS0115P
 Parthib Sarkar                              2022A7PS0111P
 Samrath Singh Khanuja                       2022A7PS1171P
-Harsimar Khanuja                            2022A7PS1187P*/
+Harsimar Singh Saluja                       2022A7PS1187P*/
 
 #ifndef LEX_DEF_
 #define LEX_DEF_
+
+#define BUFFER_SIZE 4096  // Size of each buffer
+#define EOF_MARKER '\0'   // End of buffer marker
 
 typedef enum TokenName {
     TK_ASSIGNOP,
@@ -108,5 +111,15 @@ typedef struct Token {
 
     Value* VALUE; // Stores NULL if the Token is not a number
 } tokenInfo;
+
+int line_no;
+
+char buffer1[BUFFER_SIZE + 1];
+char buffer2[BUFFER_SIZE + 1]; // Twin buffers
+int lexeme_begin;
+int forward_ptr;
+int num_of_rounds;
+int line_no;
+   
 
 #endif

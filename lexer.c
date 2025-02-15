@@ -1,11 +1,7 @@
 #include "lexer.h"
 #include "interface.h"
-#define BUFFER_SIZE 4096  // Size of each buffer
-#define EOF_MARKER '\0'   // End of buffer marker
 
-char buffer1[BUFFER_SIZE + 1], buffer2[BUFFER_SIZE + 1]; // Twin buffers
-char *lexemeBegin, *forward;  // Lexical analysis pointers
-bool useBuffer1 = true;       // Toggle flag for buffers
+    // Toggle flag for buffers
 
 FILE *getStream(FILE *fp) {
     if (!fp) return NULL;  // If file pointer is NULL, return NULL
@@ -26,7 +22,11 @@ FILE *getStream(FILE *fp) {
     return fp;  // Return file pointer for continued processing
 }
 tokenInfo getNextToken(twinBuffer B){
-    
+    char c;
+    tokenInfo token;
+    while(1){
+        token.LINE_NO = 
+    }
 }
 void removeComments(char *testcaseFile, char *cleanFile) {
     FILE *fpIn = fopen(testcaseFile, "r");
