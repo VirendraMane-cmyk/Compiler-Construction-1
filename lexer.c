@@ -1,6 +1,6 @@
 #include "lexer.h"
 #include "interface.h"
-
+#include "lexerDef.h"
     // Toggle flag for buffers
 
 FILE *getStream(FILE *fp) {
@@ -25,8 +25,13 @@ tokenInfo getNextToken(twinBuffer B){
     char c;
     tokenInfo token;
     while(1){
-        token.LINE_NO = 
+        token.LINE_NO = line_no;
+        switch(state)
+        {
+            case 0:;
+        }
     }
+
 }
 void removeComments(char *testcaseFile, char *cleanFile) {
     FILE *fpIn = fopen(testcaseFile, "r");
