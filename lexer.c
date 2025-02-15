@@ -83,6 +83,73 @@ tokenInfo getNextToken(twinBuffer *B)
                 else if(checkSingleChar(c,'a') || checkInRange(c,'e','z')){
                     state=40;
                 }
+                else if(checkSingleChar(c,'_')){
+                    state=47;
+                }
+                else if(checkSingleChar(c.'[')){
+                    state=12;
+                }
+                else if(checkSingleChar(c,']')){
+                    state=13;
+                }
+                else if(checkSingleChar(c,',')){
+                    state=11;
+                }
+                else if(checkSingleChar(c,';')){
+                    state=8;
+                }
+                else if(checkSingleChar(c,':')){
+                    state=9;
+                }
+                else if(checkSingleChar(c,'.')){
+                    state=10;
+                }
+                else if(checkSingleChar(c,')')){
+                    state=6;
+                }
+                else if(checkSingleChar(c,'(')){
+                    state=5;
+                }
+                else if(checkSingleChar(c,'+')){
+                    state=1;
+                }
+                else if(checkSingleChar(c,'-')){
+                    state=2;
+                }
+                else if(checkSingleChar(c,'*')){
+                    state=3;
+                }
+                else if(checkSingleChar(c,'/')){
+                    state=4;
+                }
+                else if(checkSingleChar(c,'~')){
+                    state=7;
+                }
+                else if(checkSingleChar(c,'!')){
+                    state=14;
+                }
+                else if(checkSingleChar(c,'>')){
+                    state=22;
+                }
+                else if(checkSingleChar(c,'=')){
+                    state=25;
+                }
+                else if(checkSingleChar(c,'@')){
+                    state=27;
+                }
+                else if(checkSingleChar(c,'&')){
+                    state=30;
+                }
+                else if(checkSingleChar(c,'%')){
+                    state=33;
+                }
+                else if(checkInRange(c,'0','9')){
+                    state=42;
+                }
+                else if(checkSingleChar(c,';')){
+                    state=8;
+                }
+                else if(single)
             }
         }
     }
