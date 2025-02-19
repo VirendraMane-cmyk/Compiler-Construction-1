@@ -70,7 +70,8 @@ typedef enum TokenName {
     TK_EQ,
     TK_GT,
     TK_GE,
-    TK_NE
+    TK_NE,
+    TK_ERR
 } TokenName;
 
 typedef union Value {

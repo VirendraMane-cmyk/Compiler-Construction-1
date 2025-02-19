@@ -434,7 +434,7 @@ tokenInfo getNextToken(twinBuffer *B)
                     free(pattern);
                     //Report error types
                     errorType = 3;
-                    state = 55;
+                    state = 100;
 
                     // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
                     retract(1,B);
@@ -460,7 +460,7 @@ tokenInfo getNextToken(twinBuffer *B)
                     free(pattern);
                     //Report error types
                     errorType = 3;
-                    state = 55;
+                    state = 100;
 
                     // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
                     retract(1,B);
@@ -479,7 +479,7 @@ tokenInfo getNextToken(twinBuffer *B)
                     free(pattern);
                     //Report error types
                     errorType = 3;
-                    state = 55;
+                    state = 100;
 
                     // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
                     retract(1,B);
@@ -505,7 +505,7 @@ tokenInfo getNextToken(twinBuffer *B)
                     free(pattern);
                     //Report error types
                     errorType = 3;
-                    state = 55;
+                    state = 100;
 
                     // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
                     retract(1,B);
@@ -524,7 +524,7 @@ tokenInfo getNextToken(twinBuffer *B)
                     free(pattern);
                     //Report error types
                     errorType = 3;
-                    state = 55;
+                    state = 100;
 
                     // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
                     retract(1,B);
@@ -730,6 +730,183 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 46 : {
+                c = getNextChar();
+                if(c == 'E'){
+                    state = 55;
+                }
+                else{
+                    retract(1,B);
+                    char* lex = copyString(B->lexemeBegin,B->forward);
+                    Value* val = (Value*)malloc(sizeof(Value));
+                    val->FLOAT_VALUE = stringToFloat(lex);
+                    token = createToken(TK_RNUM,lex,B->lineNumber,2,val);
+                    accept(B);
+                    return token;
+                    break;
+                }
+            }
+            case 47 : {
+                c = getNextChar();
+                if(checkInRange(c,'a','z') || checkInRange(c,'A','Z')) {
+                    state = 48;
+                }
+                else {
+                    // throw lexical error
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a function ID ?\n" ,lineCount,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 48 : {
+                c = getNextChar();
+                while(checkInRange(c,'a','z') || checkInRange(c,'A','Z'))
+                    c = nextChar();
+
+                if(checkInRange(c,'0','9')) {
+                    state = 49;
+                }
+                else {
+                    state = 51;
+                }
+                break;
+            }
+            case 49 : {
+                c = getNextChar();
+                while(checkInRange(c,'0','9'))
+                    c = nextChar();
+
+                state = 50;
+                break;
+            }
+            case 50 : {
+                retract(1,B);
+                int identifierLength = B->forward - B->lexemeBegin + 1;
+                if(identifierLength > 30) {
+                    printf("Line %d : Function identifier length exceeds 30 characters\n" ,B->lineNumber);
+                    errorType = 4;
+                    state = 100;
+                }
+                else {
+                    char* lex = copyString(B->lexemeBegin,B->forward);
+                    if(c == '\n')
+                        token = createToken(TK_FUNID,lex,B->lineNumber,0,NULL);
+                    else
+                        token = createToken(TK_FUNID,lex,B->lineNumber-1,0,NULL);
+                    accept(B);
+                    return token;
+                }
+                break;
+            }
+            case 51 : {
+                retract(1,B);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                NODE* n = lookUp(kt,lex);
+                if(n == NULL) {
+                    if(c == '\n')
+                        token = createToken(TK_FUNID,lex,B->lineNumber-1,0,NULL);
+                    else
+                        token = createToken(TK_FUNID,lex,B->lineNumber,0,NULL);
+                }
+                else {
+                    if(c == '\n')
+                        token = createToken(n->TOKEN_NAME,lex,B->lineNumber-1,0,NULL);
+                    else
+                        token = createToken(n->TOKEN_NAME,lex,B->lineNumber,0,NULL);
+                }
+                accept(B);
+                return token;
+                break;
+            }
+            case 52 : {
+                c = getNextChar();
+                if(checkInRange(c,'a','z')) {
+                    state = 53;
+                }
+                else {
+                    // Throw lexical error
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a record ID ?\n" ,lineCount,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 53 : {
+                c = getNextChar();
+                while(checkInRange(c,'a','z'))
+                    c = nextChar();
+
+                state = 54;
+                break;
+            }
+            case 54: {
+                retract(1,B);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                if(c == '\n')
+                    token = createToken(TK_RECORDID,lex,B->lineNumber-1,0,NULL);
+                else
+                    token = createToken(TK_RECORDID,lex,B->lineNumber,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 55 : {
+                c = getNextChar();
+                if(c == '+' || c == '-'){
+                    state = 56;
+                }
+                else if(checkInRange(c,'0','9')){
+                    state = 57;
+                }
+                else{
+                    //Throw lexical error
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s" ,B->lineNumber,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+                }
+                break;
+            }
+            case 56 : {
+                c = getNextChar();
+                if(checkInRange(c,'0','9')){
+                    state = 57;
+                }
+                else{
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s" ,B->lineNumber,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+                }
+                break;
+            }
+            case 58 : {
+                c = getNextChar();
+                if(checkInRange(c,'0','9')){
+                    state = 59;
+                }
+                else{
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s" ,B->lineNumber,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+                }
+                break;
+            }
+            case 59 : {
                 char* lex = copyString(B->lexemeBegin,B->forward);
                 Value* val = (Value*)malloc(sizeof(Value));
                 val->FLOAT_VALUE = stringToFloat(lex);
@@ -738,8 +915,32 @@ tokenInfo getNextToken(twinBuffer *B)
                 return token;
                 break;
             }
-            case 47 : {
-                
+            case 100: {
+                // Error State
+                // Rationale 1 => Set a flag that error has reached for this input program so do not tokenize any further
+                // Rationale 2 => Try to tokenize to the closest match and continue tokenizing further
+
+                // Chosen Rationale => Panic mode, Travel up till a delimiter
+
+                // Comment this, will bring it back to state 0
+                // c = nextChar();
+                // while(c != ';' && c !=  EOF && c != '\n') {
+                //     c = nextChar();
+                // }
+
+                char* lex = copyString(B->lexemeBegin,B->forward);
+
+                // A retraction only occurs if the errorType is 3, so check if the character read was a '\n'
+                if(errorType == 3 && c == '\n')
+                    token = createToken(TK_ERR,lex,B->lineNumber-1,errorType,NULL);
+                else
+                    token = createToken(TK_ERR,lex,B->lineNumber,errorType,NULL);
+                accept(B);
+
+                // Move back to the start state after setting lexemeBegin if an unidentifiable character causes the error
+                return token;
+
+                break;
             }
 
 
