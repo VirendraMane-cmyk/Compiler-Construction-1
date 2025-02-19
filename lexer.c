@@ -596,10 +596,151 @@ tokenInfo getNextToken(twinBuffer *B)
                 retract(1,B);
                 int length = B->forward - B->lexemeBegin + 1;
                 if(length < 2){
-                    
+                    printf("Line No.: %d,Identifier length less than two not permitted 2\n",B->lineNumber);
+                    errorType = 4;
+                    state = 100;
                 }
+                else if(length > 20){
+                    printf("Line No.: %d,Identifier length more than than not permitted 20\n",B->lineNumber);
+                    errorType = 4;
+                    state = 100;
+                }
+                else {
+                    char* lex = copyString(B->lexemeBegin,B->forward);
+                    if(c == '\n'){
+                        token = createToken(TK_ID,lex,B->lineNumber-1,0,NULL);
+                    }
+                    else{
+                        token = createToken(TK_ID,lex,B->lineNumber,0,NULL);
+                    }
+                    accept(B);
+                    return token;
+                }
+                break;
             }
+            case 39 : {
+                retract(1);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                // Corner case => If c is newline character, then the token was one above the current linecount
+                if(c == '\n'){
+                    token = createToken(TK_ID,lex,B->lineNumber-1,0,NULL);
+                }
+                else{
+                    token = createToken(TK_ID,lex,B->lineNumber,0,NULL);
+                }
+                accept(B);
+                return token;
+                break;
+            }
+            case 40 : {
+                c = getNextChar();
+                while(checkInRange(c,'a','z')){
+                    c = getNextChar();
+                }
+                state = 41;
+                break;
+            }
+            case 41 : {
+                retract(1,B);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                NODE* n = lookUp(kt,lex);
+                if(n == NULL) {
+                    if(c == '\n')
+                        token = createToken(TK_FIELDID,lex,B->lineNumber-1,0,NULL);
+                    else
+                        token = createToken(TK_FIELDID,lex,B->lineNumber,0,NULL);
+                }
+                else {
+                    if(c == '\n')
+                        token = createToken(n->TOKEN_NAME,lex,B->lineNumber-1,0,NULL);
+                    else
+                        token = createToken(n->TOKEN_NAME,lex,B->lineNumber,0,NULL);
+                }
+                accept(B);
+                return token;
+                break;
+            }
+            case 42: {
+                c = getNextChar();
+                while(checkInRange(c,'0','9'))
+                    c = getNextChar();
 
+                if(c == '.') {
+                    c = getNextChar();
+                    if(checkInRange(c,'0','9')){
+                        retract(1,B);
+                        state = 44;
+                    }
+                    else{
+                        char* lex = copyString(B->lexemeBegin,B->forward);
+                        token = createToken(TK_NUM,lex,B->lineNumber,0,NULL);
+                        accept(B);
+                        return token;
+                    }
+                }
+                else {
+                    state = 43;
+                }
+                break;
+            }
+            case 43 : {
+                retract(1,B);
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                Value* val = malloc(sizeof(Value));
+                val->INT_VALUE = stringToInteger(lex);
+                if(c == '\n')
+                    token = createToken(TK_NUM,lex,B->lineNumber-1,1,val);
+                else
+                    token = createToken(TK_NUM,lex,B->lineNumber,1,val);
+                accept(B);
+                return token;
+                break;
+            }
+            case 44 : {
+                c = getNextChar();
+                if(rangeMatch(c,'0','9')) {
+                    state = 45;
+                }
+                else {
+                    //Goes to start state and will read the next inout stream char
+                    //I hope
+                    token = createToken(TK_DOT,'.',B->lineNumber,0,NULL);
+                    retract(1,B);
+                    accept(B);
+                    return token;
+                }
+                break;
+            }
+            case 45 : {
+                c = getNextChar();
+                if(rangeMatch(c,'0','9')) {
+                    state = 46;
+                }
+                else {
+                    // Throw lexical
+                    char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a real number ?\n" ,B->lineCount,pattern);
+                    free(pattern);
+                    errorType = 3;
+                    state = 100;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 46 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                Value* val = (Value*)malloc(sizeof(Value));
+                val->FLOAT_VALUE = stringToFloat(lex);
+                token = createToken(TK_RNUM,lex,B->lineNumber,2,val);
+                accept(B);
+                return token;
+                break;
+            }
+            case 47 : {
+                
+            }
 
 
         }

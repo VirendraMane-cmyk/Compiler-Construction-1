@@ -125,6 +125,28 @@ int num_of_rounds;
 int line_no;
 int state;
 
+typedef struct NODE{
+    TokenName TOKEN_NAME;
+    char* LEXEME;
+    struct NODE* next;
+}NODE;
+
+typedef struct KEYWORDNODE{
+    NODE* keyWords;
+}KEYWORDNODE;
+
+typedef struct KEYWORDTABLE{
+    KEYWORDNODE* KEYWORDS;
+}KEYWORDTABLE;
+
+int hashFunction(char* str);
+
+void addEntry(KEYWORDTABLE* kt,TokenName tn,char* lexeme);
+
+NODE* lookup(KEYWORDTABLE* kt,char* lexeme);
+
+KEYWORDTABLE* initializeTable();
+
 //Set the flag if character is retracted
 int retraction_flag;
 
