@@ -84,6 +84,10 @@ void accept(twinBuffer* B){
     return;
 }
 
+char getNextChar(){
+    //Implement functionality for getting the next character from the stream
+}
+
 tokenInfo getNextToken(twinBuffer *B)
 {
     int tokenIndex = 0;
@@ -106,7 +110,7 @@ tokenInfo getNextToken(twinBuffer *B)
     // DFA processing loop.
     while (1)
     {
-        c = B->forward;
+        c = getNextChar();
         switch (state)
         {
             case 0: // Start state
@@ -297,7 +301,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 14 : {
-                c = B->forward;
+                c = getNextChar();
                 if(c == '='){
                     state = 15;
                 }
@@ -322,7 +326,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 16 : {
-                c = B->forward;
+                c = getNextChar();
                 if(c == '='){
                     state = 20;
                 }
@@ -335,7 +339,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 17 : {
-                c = B->forward;
+                c = getNextChar();
                 if(c == '-'){
                     state = 18;
                 }
@@ -353,7 +357,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 18 : {
-                c = B->forward;
+                c = getNextChar();
                 if(c == '-'){
                     state = 19;
                 }
@@ -395,7 +399,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 22 : {
-                c = B->forward;
+                c = getNextChar();
                 if(c == '=') {
                     state = 23;
                 }
@@ -419,8 +423,183 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 25 : {
-                c = B->forward;
+                c = getNextChar();
+                if(c == '='){
+                    state = 26;
+                }
+                else{
+                    char *pattern = copyString(B->lexemeBegin,B->forward - sizeof(char));
+
+                    printf("Line %d : Cannot recognize the pattern %s, Were you tring for == ?\n" ,B->lineNumber,pattern);
+                    free(pattern);
+                    //Report error types
+                    errorType = 3;
+                    state = 55;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
             }
+            case 26 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_EQ,lex,B->lineNumber,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 27 : {
+                c = getNextchar();
+                if(c == '@'){
+                    state = 28;
+                }
+                else{
+                    char *pattern = copyString(B->lexemeBegin,B->forward - sizeof(char));
+
+                    printf("Line %d : Cannot recognize the pattern %s, Were you tring for @@@ ?\n" ,B->lineNumber,pattern);
+                    free(pattern);
+                    //Report error types
+                    errorType = 3;
+                    state = 55;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 28 : {
+                c = getNextChar();
+                if(c == '@'){
+                    state = 29;
+                }
+                else{
+                    char *pattern = copyString(B->lexemeBegin,B->forward - sizeof(char));
+
+                    printf("Line %d : Cannot recognize the pattern %s, Were you tring for @@@ ?\n" ,B->lineNumber,pattern);
+                    free(pattern);
+                    //Report error types
+                    errorType = 3;
+                    state = 55;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 29 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_OR,lex,B->lineNumber,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 30 : {
+                c = getNextchar();
+                if(c == '&'){
+                    state = 31;
+                }
+                else{
+                    char *pattern = copyString(B->lexemeBegin,B->forward - sizeof(char));
+
+                    printf("Line %d : Cannot recognize the pattern %s, Were you tring for &&& ?\n" ,B->lineNumber,pattern);
+                    free(pattern);
+                    //Report error types
+                    errorType = 3;
+                    state = 55;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 31 : {
+                c = getNextChar();
+                if(c == '&'){
+                    state = 29;
+                }
+                else{
+                    char *pattern = copyString(B->lexemeBegin,B->forward - sizeof(char));
+
+                    printf("Line %d : Cannot recognize the pattern %s, Were you tring for &&& ?\n" ,B->lineNumber,pattern);
+                    free(pattern);
+                    //Report error types
+                    errorType = 3;
+                    state = 55;
+
+                    // Retract because an unforseen character lead the lexer to this state, it can be a correct character which shouldl be included in the next token
+                    retract(1,B);
+                }
+                break;
+            }
+            case 32 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                token = createToken(TK_AND,lex,B->lineNumber,0,NULL);
+                accept(B);
+                return token;
+                break;
+            }
+            case 33 : {
+                c = getNextChar();
+                while(c != '\n' && c != EOF){
+                    c = getNextChar();
+                }
+                state = 34;
+                break;
+            }
+            case 34 : {
+                char* lex = copyString(B->lexemeBegin,B->forward);
+                if(c == '\n'){
+                    token = createToken(TK_COMMENT,lex,B->lineNumber - 1,0,NULL);
+                }
+                else{
+                    token = createToken(TK_COMMENT,lex,B->lineNumber,0,NULL);
+                }
+                accept(B);
+                return token;
+                break;
+            }
+            case 35 : {
+                c = getnextChar();
+                if(checkInRange(c,'2','7')) {
+                    state = 36;
+                }
+                else if(checkInRange(c,'a','z')) {
+                    state = 40;
+                }
+                else {
+                    state = 41;
+                }
+                break;
+            }
+            case 36 : {
+                c = getNextChar();
+                while(checkInRange(c,'b','d')){
+                    c = getNextChar();
+                }
+                if(checkInRange(c,'2','7')){
+                    state = 37;
+                }
+                else{
+                    state = 39;
+                }
+                break;
+            }
+            case 37: {
+                c = getNextChar();
+                while(checkInRange(c,'2','7')){
+                    c = getNextChar();
+                }
+                state = 38;
+                break;
+            }
+            case 38 : {
+                retract(1,B);
+                int length = B->forward - B->lexemeBegin + 1;
+                if(length < 2){
+                    
+                }
+            }
+
 
 
         }
