@@ -423,7 +423,16 @@ void addToSymbolList(SymbolList* ls, Symbol* s) {
     ls->TAIL_SYMBOL = s;
     ls->RULE_LENGTH += 1;
 }
+// Extracts the grammar from GRAMMAR_FILE, return 1 on success, 0 on error
+// Working rationale of the function
+//  => Identify the LHS Non_terminal
+//  => Keep making the Symbol List
+//  => Extract the enum number of the LHS Non terminal.
+// Now we are going to start using the functions we have defined earlier
 
+Grammar* extractGrammar(){
+    
+}
 createParseTable(FirstAndFollow F, table T){
 
 }
