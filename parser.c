@@ -190,7 +190,6 @@ FirstAndFollow* initialiseFirstAndFollow() {
         fafl->FIRST[i] = (int*)calloc(vectorSize,sizeof(int));
         fafl->FOLLOW[i] = (int*)calloc(vectorSize,sizeof(int));
     }
-
     return fafl;
 
 }
@@ -262,15 +261,12 @@ void populateFirst(int** firstVector, Grammar* g) {
     }
 }
 void populateFollow(int** followVector, int** firstVector, Grammar* g) {
-
-
     for(int i=1; i <= TOTAL_GRAMMAR_RULES; i++) {
         Rule* r = g->GRAMMAR_RULES[i];
         Symbol* head = r->SYMBOLS->HEAD_SYMBOL;
         Symbol* trav = head->next;
         int epsilonIdentifier = 0;
         while(trav != NULL) {
-
             if(trav->IS_TERMINAL == 0) {
                 Symbol* followTrav = trav->next;
                 while(followTrav != NULL) {
@@ -300,8 +296,6 @@ void populateFollow(int** followVector, int** firstVector, Grammar* g) {
                 }
 
             }
-
-
             trav = trav->next;
         }
     }
@@ -429,10 +423,87 @@ void addToSymbolList(SymbolList* ls, Symbol* s) {
 //  => Keep making the Symbol List
 //  => Extract the enum number of the LHS Non terminal.
 // Now we are going to start using the functions we have defined earlier
+Grammar* extractGrammar() {
 
-Grammar* extractGrammar(){
-    
+    int ruleCount = 1; // Variable which will be used in assigning the rule numbers to the extracted rules
+    int fd = open(GRAMMAR_FILE,O_RDONLY);
+    char c; // Variable to store the character being read
+    int actualRead; // Variable to store the number of bytes being read in the system call
+    char* symbol = ""; // This will keep track of the current symbol by appending the read in character
+
+    int symbolsRead = 0; // to keep track of the No of symbols read in a particular line or a rule
+    int noOfLinesofNonTerminal = 0; // to keep track of the no the no of rules read of a particular non terminal
+    Symbol* currentNonTerminal = NULL; // to keep track of the current Non Terminal
+    SymbolList* sl = NULL; // Keeps track of the symbol list so far
+
+    initialiseGrammar();
+    ntrr = intialiseNonTerminalRecords();
+    initialiseCheckIfDone();
+
+    //create starting symbol list
+
+    while((actualRead = read(fd,&c,sizeof(char))) != 0) {
+
+        // If end of file is reached stop reading further
+        if(c == EOF) {
+            break;
+        }
+
+        // If a space is reached, it means a symbol has terminated and hence must be extracted
+        if(c == ' ') {
+            symbolsRead++;
+            Symbol* s = intialiseSymbol(symbol);
+            addToSymbolList(sl,s);
+
+            if(symbolsRead == 1 ) {
+
+                // Case when the rules of current non terminal are over
+                if(currentNonTerminal == NULL) {
+                    ntrr[s->TYPE.NON_TERMINAL] = (NonTerminalRuleRecords*)malloc(sizeof(NonTerminalRuleRecords));
+                    ntrr[s->TYPE.NON_TERMINAL]->start = 1;
+                }
+                // Case when a new LHS Non terminal arrives
+                else if(currentNonTerminal != NULL && currentNonTerminal->TYPE.NON_TERMINAL != s->TYPE.NON_TERMINAL) {
+                    ntrr[currentNonTerminal->TYPE.NON_TERMINAL]->end = ruleCount-1;
+                    ntrr[s->TYPE.NON_TERMINAL] = (NonTerminalRuleRecords*)malloc(sizeof(NonTerminalRuleRecords));
+                    ntrr[s->TYPE.NON_TERMINAL]->start = ruleCount;
+                }
+                currentNonTerminal = s;
+            }
+
+            symbol = ""; // to get this variable ready to accept the next symbol
+        }
+
+        // A newline indicates the current rule has ended and the next iteration will process a new rule, hence increment rule count
+        // Also store the symbol extracted till now
+        else if(c == '\n') {
+            Symbol* s = intialiseSymbol(symbol);
+            addToSymbolList(sl,s);
+            Rule* r = initialiseRule(sl,ruleCount);
+            g->GRAMMAR_RULES[ruleCount] = r;
+            ruleCount++;
+            symbolsRead=0;
+            symbol = "";
+        }
+        else {
+            if(symbolsRead == 0){
+                // Create a fresh Symbol List.
+                sl = initialiseSymbolList();
+            }
+
+            // Append character to the symbol string
+            symbol = appendToSymbol(symbol,c);
+        }
+
+
+    }
+
+    // Capturing the corner case of the last Non terminal record => Note this requires the GRAMMAR_FILE to terminate with a '\n'
+    ntrr[currentNonTerminal->TYPE.NON_TERMINAL]->end = ruleCount-1;
+
+    return g;
 }
+
 createParseTable(FirstAndFollow F, table T){
 
 }
