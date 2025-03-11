@@ -11,6 +11,7 @@ Harsimar Singh Saluja                       2022A7PS1187P*/
 
 #define BUFFER_SIZE 4096  // Size of each buffer
 #define EOF_MARKER '\0'   // End of buffer marker
+#include<stdio.h>
 
 typedef enum TokenName {
     TK_ASSIGNOP,
@@ -141,14 +142,6 @@ typedef struct KEYWORDNODE{
 typedef struct KEYWORDTABLE{
     KEYWORDNODE* KEYWORDS;
 }KEYWORDTABLE;
-
-int hashFunction(char* str);
-
-void addEntry(KEYWORDTABLE* kt,TokenName tn,char* lexeme);
-
-NODE* lookup(KEYWORDTABLE* kt,char* lexeme);
-
-KEYWORDTABLE* initializeTable();
 
 //Set the flag if character is retracted
 int retraction_flag;

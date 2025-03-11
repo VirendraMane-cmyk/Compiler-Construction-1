@@ -1,8 +1,15 @@
 #include "lexer.h"
 #include "interface.h"
 #include "lexerDef.h"
-#include<stdio.h>
+#include "keyword_table.h"
+#include <stdio.h>
 // Toggle flag for buffers
+KeywordTable* kt;
+
+void initializeLexer(){
+    KeywordTable* kt=initializeTable();
+}
+
 
 FILE* getStream(FILE *fp, twinBuffer* B)
 {
@@ -630,7 +637,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 39 : {
-                retract(1);
+                retract(1,B);
                 char* lex = copyString(B->lexemeBegin,B->forward);
                 // Corner case => If c is newline character, then the token was one above the current linecount
                 if(c == '\n'){

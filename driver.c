@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     printf("Implementation Status: Both lexical and syntax analysis modules implemented.\n");
 
     int choice;
+    initializeLexer();
     while (1) {
         printf("\nOptions:\n");
         printf("0. Exit\n");
