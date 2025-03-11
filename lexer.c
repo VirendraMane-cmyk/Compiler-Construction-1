@@ -5,13 +5,15 @@
 #include <stdio.h>
 // Toggle flag for buffers
 KeywordTable* kt;
+FILE* fp;
 
 void initializeLexer(){
     KeywordTable* kt=initializeTable();
 }
 
-FILE* getStream(FILE *fp, twinBuffer* B)
+FILE* getStream(FILE *f, twinBuffer* B)
 {
+    fp = f;
     if (fp == NULL)
     {
         fprintf(stderr, "Error: File pointer is NULL.\n");
@@ -104,7 +106,7 @@ void accept(twinBuffer* B){
 char getNextChar(twinBuffer* B) {
     if (B->lexemeBegin == -1 && B->forward == -1) {
         // Initialize buffers for the first time
-        int res = getStream(B);
+        int res = getStream(fp,B);
         if (res == -1) {
             return EOF;
         }
