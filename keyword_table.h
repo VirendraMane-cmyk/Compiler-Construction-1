@@ -1,3 +1,5 @@
+#ifndef KEYWORD_TABLE
+#define KEYWORD_TABLE
 #include "keyword_tableDef.h"
 
 // Functions for keyword hashtable
@@ -10,3 +12,5 @@ void printHashTable(KeywordTable* kt);
 Node* addToList(Node* ls, TokenName tn, char* lexeme);
 int searchList(Node* ls, char* lexeme);
 int printList(Node* ls);
+
+#endif //KEYWORD

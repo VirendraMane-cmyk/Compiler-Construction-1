@@ -6,6 +6,10 @@
 // Toggle flag for buffers
 KeywordTable* kt;
 FILE* fp;
+int num_of_rounds=0;
+int line_no=0;
+int state=0;
+int retraction_flag=0;
 
 void initializeLexer(){
     KeywordTable* kt=initializeTable();

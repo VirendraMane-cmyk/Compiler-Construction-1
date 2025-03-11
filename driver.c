@@ -4,7 +4,6 @@
 #include <time.h>
 #include "lexer.h"
 //#include "parser.h"
-
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Usage: %s input_file output_file\n", argv[0]);

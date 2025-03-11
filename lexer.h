@@ -1,3 +1,5 @@
+#ifndef LEXER
+#define LEXER
 #include "lexerDef.h"
 #include <stdio.h>
 FILE *getStream(FILE *fp,twinBuffer* TB);
@@ -23,3 +25,5 @@ tokenInfo createToken(TokenName tokenName,char* lexeme,int lineNumber,int isNumb
 int checkInRange(char ch,char start, char end);
 tokenInfo getNextToken(twinBuffer* B);
 void removeComments(char *testcaseFile, char *cleanFile);
+
+#endif

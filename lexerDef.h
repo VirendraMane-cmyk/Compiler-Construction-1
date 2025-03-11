@@ -114,8 +114,6 @@ typedef struct Token {
     Value* VALUE; // Stores NULL if the Token is not a number
 } tokenInfo;
 
-int line_no;
-
 typedef struct twinBuffer {  
     char buffer1[BUFFER_SIZE];  // First half of the buffer  
     char buffer2[BUFFER_SIZE];  // Second half of the buffer  
@@ -125,9 +123,6 @@ typedef struct twinBuffer {
     int currentBuffer;
     FILE* fp;          // Pointer to the current character being analyzed  
 } twinBuffer;  
-int num_of_rounds;
-int line_no;
-int state;
 
 typedef struct NODE{
     TokenName TOKEN_NAME;
@@ -143,7 +138,9 @@ typedef struct KEYWORDTABLE{
     KEYWORDNODE* KEYWORDS;
 }KEYWORDTABLE;
 
-//Set the flag if character is retracted
-int retraction_flag;
+extern int line_no;
+extern int num_of_rounds;
+extern int state;
+extern int retraction_flag;
 
 #endif
