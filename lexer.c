@@ -10,6 +10,29 @@ int num_of_rounds=0;
 int line_no=0;
 int state=0;
 int retraction_flag=0;
+twinBuffer* B;
+
+void initializeBuffer(int fp) {
+    B = malloc(sizeof(twinBuffer));
+    if (B == NULL) {
+        perror("Failed to allocate twinBuffer");
+        exit(EXIT_FAILURE);
+    }
+    
+    B->buffer1 = malloc(BUFFER_SIZE * sizeof(char));
+    B->buffer2 = malloc(BUFFER_SIZE * sizeof(char));
+    if (B->buffer1 == NULL || B->buffer2 == NULL) {
+        perror("Failed to allocate buffers");
+        exit(EXIT_FAILURE);
+    }
+    state = 0;
+    B->lexemeBegin = 0;
+    B->forward = 0;
+    B->lineNumber = 1;
+    B->currentBuffer = 0;
+    
+    B->fp = fp; // or e.g., fopen("input.txt", "r")
+}
 
 void initializeLexer(){
     KeywordTable* kt=initializeTable();
@@ -1026,64 +1049,54 @@ tokenInfo getNextToken(twinBuffer *B)
  *
  * This function is intended to be invoked once (e.g., via a driver) for evaluation.
  */
-void removeComments(char *testcaseFile, char *cleanFile)
-{
-    FILE *src = fopen(testcaseFile, "r");
-    if (!src)
-    {
-        fprintf(stderr, "Error opening source file: %s\n", testcaseFile);
-        return;
-    }
-    FILE *dest = fopen(cleanFile, "w");
-    if (!dest)
-    {
-        fprintf(stderr, "Error opening destination file: %s\n", cleanFile);
-        fclose(src);
-        return;
-    }
-    int c, next;
-    while ((c = fgetc(src)) != EOF)
-    {
-        if (c == '/')
-        {
-            next = fgetc(src);
-            if (next == EOF)
-            {
-                fputc(c, dest);
+void removeComments(char* testCaseFile, char* cleanFile) {
+    int tcf = open(testCaseFile,O_RDONLY);
+    // Commenting this as printing is required in the console
+    // int cf = open(cleanFile,O_CREAT|O_WRONLY|O_TRUNC);
+    initializeBuffers(tcf);
+    // Check has 3 values
+    // 1 => Indicates it encountered a newline
+    // 0 => Indicates that the line has been confirmed to not be a comment
+    // 2 => Indicates that the line is confirmed to be a comment
+    int check = 0;
+    char c;
+    while((c = nextChar()) != EOF) {
+
+        switch(check) {
+            case 0: {
+                if(c == ' ' || c == '\f' || c == '\r' || c == '\t' || c == '\v') {
+                    write(1,&c,1);
+                    check = 0;
+                }
+                else if(c == '%') {
+                    check = 3;
+                }
+                else if(c == '\n') {
+                    write(1,&c,1);
+                    check = 0;
+                }
+                else {
+                    write(1,&c,1);
+                    check = 2;
+                }
                 break;
             }
-            // Single-line comment: skip until newline.
-            if (next == '/')
-            {
-                while ((c = fgetc(src)) != EOF && c != '\n')
-                    ;
-                if (c != EOF)
-                    fputc(c, dest); // Preserve newline.
+            case 2: {
+                write(1,&c,1);
+                if(c == '\n')
+                    check = 0;
+                break;
             }
-            // Multi-line comment: skip until closing "*/" is found.
-            else if (next == '*')
-            {
-                int prev = 0;
-                while ((c = fgetc(src)) != EOF)
-                {
-                    if (prev == '*' && c == '/')
-                        break;
-                    prev = c;
+            case 3: {
+                if(c == '\n') {
+                    write(1,&c,1);
+                    check = 0;
                 }
-            }
-            else
-            {
-                // Not a comment: write both characters.
-                fputc(c, dest);
-                fputc(next, dest);
+                break;
             }
         }
-        else
-        {
-            // Write normal characters.
-            fputc(c, dest);
-        }
+
     }
-    fclose(src);
-    fclose(dest);
+
+    close(tcf);
 }

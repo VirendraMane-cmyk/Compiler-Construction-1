@@ -115,13 +115,13 @@ typedef struct Token {
 } tokenInfo;
 
 typedef struct twinBuffer {  
-    char buffer1[BUFFER_SIZE];  // First half of the buffer  
-    char buffer2[BUFFER_SIZE];  // Second half of the buffer  
+    char* buffer1;  // First half of the buffer  
+    char* buffer2;  // Second half of the buffer  
     int lexemeBegin;          // Pointer to the beginning of the lexeme  
     int forward;  
     int lineNumber;  
     int currentBuffer;
-    FILE* fp;          // Pointer to the current character being analyzed  
+    int fp;          // Pointer to the current character being analyzed  
 } twinBuffer;  
 
 typedef struct NODE{
