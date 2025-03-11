@@ -21,4 +21,4 @@ tokenInfo createToken(TokenName tokenName,char* lexeme,int lineNumber,int isNumb
 
 int checkInRange(char ch,char start, char end);
 tokenInfo getNextToken(twinBuffer* B);
-removeComments(char *testcaseFile, char *cleanFile);
+void removeComments(char *testcaseFile, char *cleanFile);

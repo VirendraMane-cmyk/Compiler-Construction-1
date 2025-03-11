@@ -719,7 +719,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 else {
                     // Throw lexical
                     char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
-                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a real number ?\n" ,B->lineCount,pattern);
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a real number ?\n" ,B->lineNumber,pattern);
                     free(pattern);
                     errorType = 3;
                     state = 100;
@@ -753,7 +753,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 else {
                     // throw lexical error
                     char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
-                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a function ID ?\n" ,lineCount,pattern);
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a function ID ?\n" ,B->lineNumber,pattern);
                     free(pattern);
                     errorType = 3;
                     state = 100;
@@ -831,7 +831,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 else {
                     // Throw lexical error
                     char* pattern = copyString(B->lexemeBegin, B->forward-sizeof(char));
-                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a record ID ?\n" ,lineCount,pattern);
+                    printf("Line %d : Cannot recognize pattern %s, Were you tring for a record ID ?\n" ,B->lineNumber,pattern);
                     free(pattern);
                     errorType = 3;
                     state = 100;
