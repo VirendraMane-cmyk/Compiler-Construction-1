@@ -12,7 +12,7 @@ int state=0;
 int retraction_flag=0;
 twinBuffer* B;
 
-void initializeBuffers(int fp) {
+void initializeBuffers(FILE* fp) {
     B = malloc(sizeof(twinBuffer));
     if (B == NULL) {
         perror("Failed to allocate twinBuffer");
@@ -26,46 +26,42 @@ void initializeBuffers(int fp) {
         exit(EXIT_FAILURE);
     }
     state = 0;
-    B->lexemeBegin = 0;
-    B->forward = 0;
+    B->lexemeBegin = -1;
+    B->forward = -1;
     B->lineNumber = 1;
     B->currentBuffer = 0;
     
     B->fp = fp; // or e.g., fopen("input.txt", "r")
 }
 
-void initializeLexer(){
+void initializeLexer(FILE* fp){
     KeywordTable* kt=initializeTable();
-    initializeBuffer();
+    initializeBuffers(fp);
 }
-
 FILE* getStream(FILE *f, twinBuffer* B)
 {
-    fp = f;
-    if (fp == NULL)
-    {
+    if (f == NULL) {
         fprintf(stderr, "Error: File pointer is NULL.\n");
         return NULL;
     }
     
-    B->fp = fp;
-    B->currentBuffer = 1;
+    B->fp = f;
+    B->currentBuffer = 0;  // We'll treat 0 as buffer1 and 1 as buffer2
     B->lineNumber = 1;
     
-    size_t bytesRead = fread(B->buffer1, sizeof(char), BUFFER_SIZE, fp);
+    size_t bytesRead = fread(B->buffer1, sizeof(char), BUFFER_SIZE, f);
     
-    if (bytesRead == 0){
-        B->buffer1[0] = '\0';
-    }
-    else
-    {
+    if (bytesRead == 0) {
+        B->buffer1[0] = '\0';  // Mark the buffer as empty
+    } else {
         B->buffer1[bytesRead] = '\0'; // Null-terminate the buffer
     }
-
+    
     B->forward = 0; // Initialize forward as an index
     
-    return fp;
+    return f;
 }
+
 /*
  * getNextToken
  *
@@ -142,45 +138,56 @@ void accept(twinBuffer* B){
     return;
 }
 
-char getNextChar(twinBuffer* B) {
+int getNextChar(twinBuffer* B) {
+    // Check if the buffer is uninitialized; use -1 as an initial flag
     if (B->lexemeBegin == -1 && B->forward == -1) {
+        if (B->fp == NULL) {
+            fprintf(stderr, "Error: twinBuffer file pointer is NULL.\n");
+            return EOF;
+        }
         // Initialize buffers for the first time
-        int res = getStream(fp,B);
-        if (res == -1) {
+        if (getStream(B->fp, B) == NULL) {
             return EOF;
         }
         B->lexemeBegin = 0;
         B->forward = 0;
         B->currentBuffer = 0;
     }
-
+    
     // Determine the current buffer
     char* buffer = (B->currentBuffer == 0) ? B->buffer1 : B->buffer2;
     char curr_char = buffer[B->forward];
     
-    // Checking buffer overflow
-    if (B->forward == BUFFER_SIZE - 1) {
-        int res = getStream(fp,B);
-        if (res == -1) {
+    // If we've reached the end of the current buffer, check for EOF
+    if (curr_char == '\0') {
+        return EOF;
+    }
+    
+    // Check for buffer overflow. If we are at the last index, try to reload.
+    if (B->forward >= BUFFER_SIZE - 1) {
+        if (getStream(B->fp, B) == NULL || B->buffer1[0] == '\0') {
             return EOF;
         }
-        B->currentBuffer = 1 - B->currentBuffer;  // Toggle buffer
+        // Toggle the current buffer (assuming you have logic to alternate buffers)
+        B->currentBuffer = 1 - B->currentBuffer;
         B->forward = 0;
+        buffer = (B->currentBuffer == 0) ? B->buffer1 : B->buffer2;
+        curr_char = buffer[B->forward];
     } else {
         B->forward++;
     }
-
+    
     // Only increment lineNumber if the character read is '\n'
-    if (retraction_flag == 0 && curr_char == '\n') {
+    if (curr_char == '\n' && retraction_flag == 0) {
         B->lineNumber++;
     }
-
+    
     // Unset the retraction flag if it was set
     if (retraction_flag == 1) {
         retraction_flag = 0;
     }
-
-    return curr_char;
+    
+    return (int) curr_char;
 }
 
 tokenInfo getNextToken(twinBuffer *B)
@@ -1051,53 +1058,62 @@ tokenInfo getNextToken(twinBuffer *B)
  * This function is intended to be invoked once (e.g., via a driver) for evaluation.
  */
 void removeComments(char* testCaseFile, char* cleanFile) {
-    int tcf = open(testCaseFile,O_RDONLY);
-    // Commenting this as printing is required in the console
-    // int cf = open(cleanFile,O_CREAT|O_WRONLY|O_TRUNC);
+    // Open the test case file for reading.
+    FILE* tcf = fopen(testCaseFile, "r");
+    if (tcf == NULL) {
+        printf("NOT ABLE TO OPEN FILE %s (pointer is NULL)\n", testCaseFile);
+        return;
+    }
     initializeBuffers(tcf);
-    // Check has 3 values
-    // 1 => Indicates it encountered a newline
-    // 0 => Indicates that the line has been confirmed to not be a comment
-    // 2 => Indicates that the line is confirmed to be a comment
+    // Open the clean file for writing.
+    FILE* out = fopen(cleanFile, "w");
+    if (out == NULL) {
+        printf("Error opening clean file %s\n", cleanFile);
+        fclose(tcf);
+        return;
+    }
+    //printf("HERE!!\n");
+    
+    getStream(tcf, &B);
+    
+    // The check variable indicates the current state in comment removal.
+    // 0: no comment detected; 2: inside a non-comment section; 3: inside a comment.
     int check = 0;
-    char c;
-    while((c = getNextChar()) != EOF) {
-
-        switch(check) {
-            case 0: {
-                if(c == ' ' || c == '\f' || c == '\r' || c == '\t' || c == '\v') {
-                    write(1,&c,1);
+    int c;
+    while ((c = getNextChar(&B)) != EOF) {
+        char ch = (char)c; // Convert int to char for writing
+        switch (check) {
+            case 0:
+                if (ch == ' ' || ch == '\f' || ch == '\r' || ch == '\t' || ch == '\v') {
+                    fwrite(&ch, 1, 1, out);
                     check = 0;
                 }
-                else if(c == '%') {
+                else if (ch == '%') {
                     check = 3;
                 }
-                else if(c == '\n') {
-                    write(1,&c,1);
+                else if (ch == '\n') {
+                    fwrite(&ch, 1, 1, out);
                     check = 0;
                 }
                 else {
-                    write(1,&c,1);
+                    fwrite(&ch, 1, 1, out);
                     check = 2;
                 }
                 break;
-            }
-            case 2: {
-                write(1,&c,1);
-                if(c == '\n')
+            case 2:
+                fwrite(&ch, 1, 1, out);
+                if (ch == '\n')
                     check = 0;
                 break;
-            }
-            case 3: {
-                if(c == '\n') {
-                    write(1,&c,1);
+            case 3:
+                if (ch == '\n') {
+                    fwrite(&ch, 1, 1, out);
                     check = 0;
                 }
                 break;
-            }
         }
-
     }
-
-    close(tcf);
+    
+    fclose(tcf);
+    fclose(out);
 }

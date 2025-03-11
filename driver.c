@@ -11,9 +11,10 @@ int main(int argc, char* argv[]) {
     }
 
     printf("Implementation Status: Both lexical and syntax analysis modules implemented.\n");
-
+    FILE* fp = fopen(argv[1],"r");
+    initializeLexer(fp);
     int choice;
-    initializeLexer();
+    //initializeLexer();
     while (1) {
         printf("\nOptions:\n");
         printf("0. Exit\n");
@@ -23,18 +24,20 @@ int main(int argc, char* argv[]) {
         // printf("4. Measure execution time\n");
         // printf("Enter your choice: ");
         scanf("%d", &choice);
-
+        
+        //printf("HERE!!!");
         switch (choice) {
             case 0:
                 return 0;
             case 1:
+                //printf("HERE!!!\n");
                 char cleanFile[256];
-                sprintf(cleanFile, "%s_no_comments.txt", argv[1]);
+                sprintf(cleanFile, argv[2], argv[1]);
+                
                 removeComments(argv[1], cleanFile);
-                printf("Comments removed and saved to %s\n", cleanFile);
+                printf("Comments removed and saved to %s\n", argv[2]);
                 break;
             case 2:
-                FILE* fp = fopen(argv[1], "r");
                 if (fp == NULL) {
                     printf("Could not open file %s\n", argv[1]);
                     break;
@@ -121,7 +124,7 @@ int main(int argc, char* argv[]) {
             
             default:
                 printf("Invalid choice. Please try again.\n");
-                continue;
+                break;
         }
     }
 

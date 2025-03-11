@@ -12,9 +12,9 @@ void accept(twinBuffer* B);
 
 void initBuffer(int size);
 
-char getNextChar();
+int getNextChar(twinBuffer* B);
 
-void initLexer(int f);
+void initLexer(FILE* f);
 
 
 
