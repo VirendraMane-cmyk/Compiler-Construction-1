@@ -62,6 +62,34 @@ FILE* getStream(FILE *f, twinBuffer* B)
     retraction_flag = 1;
 }
 
+float stringToFloat(const char *str) {
+    char *end;
+    float result = strtof(str, &end);
+    return result;
+}
+
+int stringToInteger(const char* str) {
+    char *end;
+    errno = 0;  // Reset errno before the call
+    long result = strtol(str, &end, 10);
+
+    // Check for conversion errors:
+    // 1. No digits were found.
+    // 2. The number is out of the int range.
+    if (end == str) {
+        // No conversion was performed.
+        return 0;
+    }
+    if ((errno == ERANGE && (result == LONG_MAX || result == LONG_MIN)) ||
+         result > INT_MAX || result < INT_MIN) {
+        // Out of range error.
+        return 0;
+    }
+    
+    return (int)result;
+}
+
+
 int checkInRange(char ch,char start, char end) {
     if(ch >= start && ch <= end)
         return 1;
@@ -754,7 +782,7 @@ tokenInfo getNextToken(twinBuffer *B)
             }
             case 44 : {
                 c = getNextChar(B);
-                if(rangeMatch(c,'0','9')) {
+                if(checkInRange(c,'0','9')) {
                     state = 45;
                 }
                 else {
@@ -769,7 +797,7 @@ tokenInfo getNextToken(twinBuffer *B)
             }
             case 45 : {
                 c = getNextChar(B);
-                if(rangeMatch(c,'0','9')) {
+                if(checkInRange(c,'0','9')) {
                     state = 46;
                 }
                 else {
