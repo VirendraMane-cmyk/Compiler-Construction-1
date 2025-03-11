@@ -4,22 +4,32 @@
 #include<stdio.h>
 // Toggle flag for buffers
 
-FILE *getStream(FILE *fp,twinBuffer* TB)
+FILE* getStream(FILE *fp, twinBuffer* B)
 {
     if (fp == NULL)
     {
         fprintf(stderr, "Error: File pointer is NULL.\n");
         return NULL;
     }
-    TB.fp = fp;
-    TB.currentBuffer = 1;
-    TB.lineNumber = 1;
-    size_t bytesRead = fread(TB.buffer1, sizeof(char), BUFFER_SIZE, fp);
-    TB.buffer1[bytesRead] = '\0'; // Null-terminate the buffer
-    TB.forward = TB.buffer1;
+    
+    B->fp = fp;
+    B->currentBuffer = 1;
+    B->lineNumber = 1;
+    
+    size_t bytesRead = fread(B->buffer1, sizeof(char), BUFFER_SIZE, fp);
+    
+    if (bytesRead == 0){
+        B->buffer1[0] = '\0';
+    }
+    else
+    {
+        B->buffer1[bytesRead] = '\0'; // Null-terminate the buffer
+    }
+
+    B->forward = 0; // Initialize forward as an index
+    
     return fp;
 }
-
 /*
  * getNextToken
  *
