@@ -942,8 +942,6 @@ tokenInfo getNextToken(twinBuffer *B)
 
                 break;
             }
-
-
         }
     }
 }
