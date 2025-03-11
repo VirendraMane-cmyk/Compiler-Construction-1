@@ -49,10 +49,10 @@ int main(int argc, char* argv[]) {
                 printf("%-15s %-15s %-10s\n", "Token Name", "Lexeme", "Line Number");
                 while (1) {
                     token = getNextToken(&B);
-                    if (token.TOKEN_NAME == EOF_TOKEN) {
+                    if (token.TOKEN_NAME == TK_ERR) {
                         break;
                     }
-                    printf("%-15d %-15s %-10d\n", token.TOKEN_NAME, token.LEXEME, token.lineNumber);
+                    printf("%-15d %-15s %-10d\n", token.TOKEN_NAME, token.LEXEME, token.LINE_NO);
                 }
                 fclose(fp);
                 break;
