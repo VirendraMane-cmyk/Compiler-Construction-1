@@ -12,7 +12,7 @@ int state=0;
 int retraction_flag=0;
 twinBuffer* B;
 
-void initializeBuffer(int fp) {
+void initializeBuffers(int fp) {
     B = malloc(sizeof(twinBuffer));
     if (B == NULL) {
         perror("Failed to allocate twinBuffer");
@@ -36,6 +36,7 @@ void initializeBuffer(int fp) {
 
 void initializeLexer(){
     KeywordTable* kt=initializeTable();
+    initializeBuffer();
 }
 
 FILE* getStream(FILE *f, twinBuffer* B)
@@ -1060,7 +1061,7 @@ void removeComments(char* testCaseFile, char* cleanFile) {
     // 2 => Indicates that the line is confirmed to be a comment
     int check = 0;
     char c;
-    while((c = nextChar()) != EOF) {
+    while((c = getNextChar()) != EOF) {
 
         switch(check) {
             case 0: {
