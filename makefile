@@ -1,26 +1,8 @@
-# Compiler and flags
-CC      = gcc
-CFLAGS  = -w -g
-
-# Source files and target executable
-SRCS    = lexer.c keyword_table.c driver.c
-OBJS    = $(SRCS:.c=.o)
-TARGET  = lexer
-
-# Default target
-all: $(TARGET)
-
-# Link object files to create the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# Compile source files into object files
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Clean up build artifacts
-clean:
-	rm -f $(OBJS) $(TARGET)
-
-# Phony targets
-.PHONY: all clean
+lexer : lexer.o keyword_table.o driver.o
+gcc lexer.o keyword_table.o driver.o -o myprogram
+lexer.o : lexer.c lexer.h lexerDef.h
+gcc -c lexer.c
+keyword_table.o : keyword_table.c keyword_table.h keyword_tableDef.h
+gcc -c keyword_table.c
+driver.o : driver.c lexer.h keyword_table.h
+gcc -c driver.c
