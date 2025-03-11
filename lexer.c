@@ -164,7 +164,7 @@ tokenInfo getNextToken(twinBuffer *B)
     // DFA processing loop.
     while (1)
     {
-        c = getNextChar();
+        c = getNextChar(B);
         switch (state)
         {
             case 0: // Start state
@@ -355,7 +355,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 14 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '='){
                     state = 15;
                 }
@@ -380,7 +380,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 16 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '='){
                     state = 20;
                 }
@@ -393,7 +393,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 17 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '-'){
                     state = 18;
                 }
@@ -411,7 +411,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 18 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '-'){
                     state = 19;
                 }
@@ -453,7 +453,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 22 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '=') {
                     state = 23;
                 }
@@ -477,7 +477,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 25 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '='){
                     state = 26;
                 }
@@ -503,7 +503,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 27 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '@'){
                     state = 28;
                 }
@@ -522,7 +522,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 28 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '@'){
                     state = 29;
                 }
@@ -548,7 +548,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 30 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '&'){
                     state = 31;
                 }
@@ -567,7 +567,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 31 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '&'){
                     state = 29;
                 }
@@ -593,9 +593,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 33 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(c != '\n' && c != EOF){
-                    c = getNextChar();
+                    c = getNextChar(B);
                 }
                 state = 34;
                 break;
@@ -613,7 +613,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 35 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(checkInRange(c,'2','7')) {
                     state = 36;
                 }
@@ -626,9 +626,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 36 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'b','d')){
-                    c = getNextChar();
+                    c = getNextChar(B);
                 }
                 if(checkInRange(c,'2','7')){
                     state = 37;
@@ -639,9 +639,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 37: {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'2','7')){
-                    c = getNextChar();
+                    c = getNextChar(B);
                 }
                 state = 38;
                 break;
@@ -687,9 +687,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 40 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'a','z')){
-                    c = getNextChar();
+                    c = getNextChar(B);
                 }
                 state = 41;
                 break;
@@ -715,12 +715,12 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 42: {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'0','9'))
-                    c = getNextChar();
+                    c = getNextChar(B);
 
                 if(c == '.') {
-                    c = getNextChar();
+                    c = getNextChar(B);
                     if(checkInRange(c,'0','9')){
                         retract(1,B);
                         state = 44;
@@ -751,7 +751,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 44 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(rangeMatch(c,'0','9')) {
                     state = 45;
                 }
@@ -766,7 +766,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 45 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(rangeMatch(c,'0','9')) {
                     state = 46;
                 }
@@ -784,7 +784,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 46 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == 'E'){
                     state = 55;
                 }
@@ -800,7 +800,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 }
             }
             case 47 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(checkInRange(c,'a','z') || checkInRange(c,'A','Z')) {
                     state = 48;
                 }
@@ -818,9 +818,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 48 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'a','z') || checkInRange(c,'A','Z'))
-                    c = nextChar();
+                    c = getNextChar(B);
 
                 if(checkInRange(c,'0','9')) {
                     state = 49;
@@ -831,9 +831,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 49 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'0','9'))
-                    c = nextChar();
+                    c = getNextChar(B);
 
                 state = 50;
                 break;
@@ -878,7 +878,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 52 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(checkInRange(c,'a','z')) {
                     state = 53;
                 }
@@ -896,9 +896,9 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 53 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 while(checkInRange(c,'a','z'))
-                    c = nextChar();
+                    c = getNextChar(B);
 
                 state = 54;
                 break;
@@ -915,7 +915,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 55 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(c == '+' || c == '-'){
                     state = 56;
                 }
@@ -933,7 +933,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 56 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(checkInRange(c,'0','9')){
                     state = 57;
                 }
@@ -947,7 +947,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 58 : {
-                c = getNextChar();
+                c = getNextChar(B);
                 if(checkInRange(c,'0','9')){
                     state = 59;
                 }
