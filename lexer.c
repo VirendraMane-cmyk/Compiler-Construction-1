@@ -62,16 +62,17 @@ FILE* getStream(FILE *f, twinBuffer* B)
     retraction_flag = 1;
 }
 
-float stringToFloat(const char *str) {
-    float result = aotf(str);
-    return result;
+int stringToInteger(char* str) {
+    int num;
+    sscanf(str,"%d",&num);
+    return num;
 }
 
-int stringToInteger(const char* str) {
-    int res = atoi(str);
-    return res;
+float stringToFloat(char* str) {
+    float f;
+    sscanf(str,"%f",&f);
+    return f;
 }
-
 int checkInRange(char ch,char start, char end) {
     if(ch >= start && ch <= end)
         return 1;

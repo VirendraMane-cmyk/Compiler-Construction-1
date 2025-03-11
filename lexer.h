@@ -8,8 +8,6 @@ int checkSingleChar(char ch, char chToEqual);
 
 void accept(twinBuffer* B);
 
-float stringToFloat(char* string)
-
 void initBuffer(int size);
 
 char getNextChar();
