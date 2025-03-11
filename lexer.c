@@ -104,7 +104,7 @@ void accept(twinBuffer* B){
 char getNextChar(twinBuffer* B) {
     if (B->lexemeBegin == -1 && B->forward == -1) {
         // Initialize buffers for the first time
-        int res = getInputStream(B);
+        int res = getStream(B);
         if (res == -1) {
             return EOF;
         }
