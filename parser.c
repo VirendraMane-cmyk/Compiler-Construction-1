@@ -307,7 +307,6 @@ void populateFollowTillStable(int** followVector, int** firstVector, Grammar* g)
     for(int i=0; i < TOTAL_GRAMMAR_NONTERMINALS; i++) {
         prevFollowVector[i] = (int*)calloc(vectorSize,sizeof(int));
     }
-
     followVector[program][TK_DOLLAR] = 1;
     prevFollowVector[program][TK_DOLLAR] = 1;
 
@@ -412,7 +411,6 @@ void addToSymbolList(SymbolList* ls, Symbol* s) {
         ls->RULE_LENGTH = 1;
         return;
     }
-
     ls->TAIL_SYMBOL->next = s;
     ls->TAIL_SYMBOL = s;
     ls->RULE_LENGTH += 1;
@@ -513,7 +511,7 @@ ParseTree* parseInputSourceCode(char *testcaseFile, ParsingTable* pTable, FirstA
 
     syntaxErrorFlag = *((int*)malloc(sizeof(int)));
     lexicalErrorFlag = *((int*)malloc(sizeof(int)));
-    
+
     syntaxErrorFlag = 0;
     lexicalErrorFlag = 0;
     Token* missedToken = NULL;
@@ -687,10 +685,8 @@ ParseTree* parseInputSourceCode(char *testcaseFile, ParsingTable* pTable, FirstA
     return pt;
 }
 void printParseTreeHelper(NaryTreeNode * pt, FILE* f) {
-
     if(pt == NULL)
         return;
-
     if(pt->IS_LEAF_NODE == 1) {
         int tokenEnumID = pt->NODE_TYPE.L.ENUM_ID;
         char lexeme[30];
