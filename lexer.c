@@ -10,7 +10,6 @@ void initializeLexer(){
     KeywordTable* kt=initializeTable();
 }
 
-
 FILE* getStream(FILE *fp, twinBuffer* B)
 {
     if (fp == NULL)
@@ -102,8 +101,45 @@ void accept(twinBuffer* B){
     return;
 }
 
-char getNextChar(){
-    //Implement functionality for getting the next character from the stream
+char getNextChar(twinBuffer* B) {
+    if (B->lexemeBegin == -1 && B->forward == -1) {
+        // Initialize buffers for the first time
+        int res = getInputStream(B);
+        if (res == -1) {
+            return EOF;
+        }
+        B->lexemeBegin = 0;
+        B->forward = 0;
+        B->currentBuffer = 0;
+    }
+
+    // Determine the current buffer
+    char* buffer = (B->currentBuffer == 0) ? B->buffer1 : B->buffer2;
+    char curr_char = buffer[B->forward];
+    
+    // Checking buffer overflow
+    if (B->forward == BUFFER_SIZE - 1) {
+        int res = getInputStream(B);
+        if (res == -1) {
+            return EOF;
+        }
+        B->currentBuffer = 1 - B->currentBuffer;  // Toggle buffer
+        B->forward = 0;
+    } else {
+        B->forward++;
+    }
+
+    // Only increment lineNumber if the character read is '\n'
+    if (retraction_flag == 0 && curr_char == '\n') {
+        B->lineNumber++;
+    }
+
+    // Unset the retraction flag if it was set
+    if (retraction_flag == 1) {
+        retraction_flag = 0;
+    }
+
+    return curr_char;
 }
 
 tokenInfo getNextToken(twinBuffer *B)
@@ -467,7 +503,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 27 : {
-                c = getNextchar();
+                c = getNextChar();
                 if(c == '@'){
                     state = 28;
                 }
@@ -512,7 +548,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 30 : {
-                c = getNextchar();
+                c = getNextChar();
                 if(c == '&'){
                     state = 31;
                 }
@@ -577,7 +613,7 @@ tokenInfo getNextToken(twinBuffer *B)
                 break;
             }
             case 35 : {
-                c = getnextChar();
+                c = getNextChar();
                 if(checkInRange(c,'2','7')) {
                     state = 36;
                 }
