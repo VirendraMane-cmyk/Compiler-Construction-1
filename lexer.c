@@ -63,8 +63,7 @@ FILE* getStream(FILE *f, twinBuffer* B)
 }
 
 float stringToFloat(const char *str) {
-    char *end;
-    float result = strtof(str, &end);
+    float result = aotf(str);
     return result;
 }
 
