@@ -121,7 +121,7 @@ char getNextChar(twinBuffer* B) {
     
     // Checking buffer overflow
     if (B->forward == BUFFER_SIZE - 1) {
-        int res = getInputStream(B);
+        int res = getStream(fp,B);
         if (res == -1) {
             return EOF;
         }
