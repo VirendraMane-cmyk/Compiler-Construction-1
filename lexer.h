@@ -1,4 +1,5 @@
 #include "lexerDef.h"
+#include <stdio.h>
 FILE *getStream(FILE *fp);
 
 void retract(int amt,twinBuffer* B);

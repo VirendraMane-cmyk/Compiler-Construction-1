@@ -1,9 +1,10 @@
 #include "lexer.h"
 #include "interface.h"
 #include "lexerDef.h"
+#include<stdio.h>
 // Toggle flag for buffers
 
-FILE *getStream(FILE *fp)
+FILE *getStream(FILE *fp,twinBuffer* TB)
 {
     if (fp == NULL)
     {
