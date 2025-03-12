@@ -2,7 +2,7 @@
 #define LEXER
 #include "lexerDef.h"
 #include <stdio.h>
-FILE *getStream(FILE *fp,twinBuffer* TB);
+FILE *getStream();
 
 void retract(int amt,twinBuffer* B);
 
@@ -12,7 +12,7 @@ void accept(twinBuffer* B);
 
 void initBuffer(int size);
 
-int getNextChar(twinBuffer* B);
+int getNextChar();
 
 void initLexer(FILE* f);
 

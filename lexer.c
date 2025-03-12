@@ -11,7 +11,27 @@ int line_no=0;
 int state=0;
 int retraction_flag=0;
 twinBuffer* B;
+#define MAX_LEXEME_LENGTH 21  // 20 characters + 1 for the null terminator
 
+void initializeToken(tokenInfo *token) {
+    // Set the token name to a default value.
+    token->TOKEN_NAME = TK_UNKNOWN;
+
+    // Allocate memory for the lexeme (20 characters max + 1 for '\0')
+    token->LEXEME = (char*)malloc(MAX_LEXEME_LENGTH * sizeof(char));
+    if (token->LEXEME == NULL) {
+        fprintf(stderr, "Memory allocation error for token lexeme.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the allocated memory to 0
+    memset(token->LEXEME, 0, MAX_LEXEME_LENGTH * sizeof(char));
+
+    // Initialize other members to default values.
+    token->LINE_NO = 0;
+    token->IS_NUMBER = 0;
+    token->VALUE = NULL;
+}
 void initializeBuffers(FILE* fp) {
     B = malloc(sizeof(twinBuffer));
     if (B == NULL) {
@@ -34,22 +54,23 @@ void initializeBuffers(FILE* fp) {
     B->fp = fp; // or e.g., fopen("input.txt", "r")
 }
 
-void initializeLexer(FILE* fp){
+void initializeLexer(FILE* f){
+    fp = f;
     KeywordTable* kt=initializeTable();
     initializeBuffers(fp);
 }
-FILE* getStream(FILE *f, twinBuffer* B)
+FILE* getStream()
 {
-    if (f == NULL) {
+    if (fp == NULL) {
         fprintf(stderr, "Error: File pointer is NULL.\n");
         return NULL;
     }
     
-    B->fp = f;
+    B->fp = fp;
     B->currentBuffer = 0;  // We'll treat 0 as buffer1 and 1 as buffer2
     B->lineNumber = 1;
     
-    size_t bytesRead = fread(B->buffer1, sizeof(char), BUFFER_SIZE, f);
+    size_t bytesRead = fread(B->buffer1, sizeof(char), BUFFER_SIZE, fp);
     
     if (bytesRead == 0) {
         B->buffer1[0] = '\0';  // Mark the buffer as empty
@@ -59,7 +80,7 @@ FILE* getStream(FILE *f, twinBuffer* B)
     
     B->forward = 0; // Initialize forward as an index
     
-    return f;
+    return fp;
 }
 
 /*
@@ -138,15 +159,16 @@ void accept(twinBuffer* B){
     return;
 }
 
-int getNextChar(twinBuffer* B) {
+int getNextChar() {
     // Check if the buffer is uninitialized; use -1 as an initial flag
     if (B->lexemeBegin == -1 && B->forward == -1) {
+
         if (B->fp == NULL) {
             fprintf(stderr, "Error: twinBuffer file pointer is NULL.\n");
             return EOF;
         }
         // Initialize buffers for the first time
-        if (getStream(B->fp, B) == NULL) {
+        if (getStream() == NULL) {
             return EOF;
         }
         B->lexemeBegin = 0;
@@ -165,7 +187,7 @@ int getNextChar(twinBuffer* B) {
     
     // Check for buffer overflow. If we are at the last index, try to reload.
     if (B->forward >= BUFFER_SIZE - 1) {
-        if (getStream(B->fp, B) == NULL || B->buffer1[0] == '\0') {
+        if (getStream(B->fp) == NULL || B->buffer1[0] == '\0') {
             return EOF;
         }
         // Toggle the current buffer (assuming you have logic to alternate buffers)
@@ -186,13 +208,15 @@ int getNextChar(twinBuffer* B) {
     if (retraction_flag == 1) {
         retraction_flag = 0;
     }
-    
+    //printf("%c\n",curr_char);
     return (int) curr_char;
 }
 
+
 tokenInfo getNextToken()
 {
-    printf("hi]");
+    
+    //printf("hi\n");
     int tokenIndex = 0;
     int state = 0; // DFA initial state
     char c;
@@ -200,8 +224,8 @@ tokenInfo getNextToken()
 
     // Clear the lexeme buffer.
     tokenInfo token;
-    memset(token.LEXEME, 0, sizeof(token.LEXEME));
-
+    initializeToken(&token);
+    //printf("here\n");
     // Skip whitespace and update line numbers.
     char* current_buffer = B->currentBuffer ? B->buffer1 : B->buffer2;
     while (isspace(current_buffer[B->forward]))
@@ -210,11 +234,13 @@ tokenInfo getNextToken()
             B->lineNumber++;
         B->forward++;
     }
-    printf("Hello!!!!!!!!\n");
+    //printf("Hello!!!!!!!!\n");
     // DFA processing loop.
     while (1)
     {
-        c = getNextChar(B);
+        int temp = getNextChar();
+        c = (char)(temp);
+        printf("%c\n",c);
         switch (state)
         {
             case 0: // Start state
@@ -1076,7 +1102,7 @@ void removeComments(char* testCaseFile, char* cleanFile) {
     }
     //printf("HERE!!\n");
     
-    getStream(tcf, &B);
+    getStream();
     
     // The check variable indicates the current state in comment removal.
     // 0: no comment detected; 2: inside a non-comment section; 3: inside a comment.

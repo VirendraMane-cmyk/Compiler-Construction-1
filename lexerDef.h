@@ -14,6 +14,7 @@ Harsimar Singh Saluja                       2022A7PS1187P*/
 #include<stdio.h>
 
 typedef enum TokenName {
+    TK_UNKNOWN,
     TK_ASSIGNOP,
     TK_COMMENT,
     TK_ID,
