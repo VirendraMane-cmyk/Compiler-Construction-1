@@ -121,7 +121,7 @@ typedef struct twinBuffer {
     int forward;  
     int lineNumber;  
     int currentBuffer;
-    int fp;          // Pointer to the current character being analyzed  
+    FILE* fp;          // Pointer to the current character being analyzed  
 } twinBuffer;  
 
 typedef struct NODE{
