@@ -190,8 +190,9 @@ int getNextChar(twinBuffer* B) {
     return (int) curr_char;
 }
 
-tokenInfo getNextToken(twinBuffer *B)
+tokenInfo getNextToken()
 {
+    printf("hi]");
     int tokenIndex = 0;
     int state = 0; // DFA initial state
     char c;
@@ -202,13 +203,14 @@ tokenInfo getNextToken(twinBuffer *B)
     memset(token.LEXEME, 0, sizeof(token.LEXEME));
 
     // Skip whitespace and update line numbers.
-    while (isspace(B->forward))
+    char* current_buffer = B->currentBuffer ? B->buffer1 : B->buffer2;
+    while (isspace(current_buffer[B->forward]))
     {
-        if (B->forward == '\n')
+        if (current_buffer[B->forward] == '\n')
             B->lineNumber++;
         B->forward++;
     }
-
+    printf("Hello!!!!!!!!\n");
     // DFA processing loop.
     while (1)
     {

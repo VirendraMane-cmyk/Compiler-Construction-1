@@ -23,7 +23,7 @@ char* copyString(char* start, char* end);
 tokenInfo createToken(TokenName tokenName,char* lexeme,int lineNumber,int isNumber,Value* value);
 
 int checkInRange(char ch,char start, char end);
-tokenInfo getNextToken(twinBuffer* B);
+tokenInfo getNextToken();
 void removeComments(char *testcaseFile, char *cleanFile);
 
 #endif

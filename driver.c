@@ -42,19 +42,14 @@ int main(int argc, char* argv[]) {
                     printf("Could not open file %s\n", argv[1]);
                     break;
                 }
-                twinBuffer *B = malloc(sizeof(twinBuffer));
-                if (B == NULL) {
-                   fprintf(stderr, "Memory allocation failed\n");
-                   exit(1);
-                }
-                //printf("HERE!!!!!!!!!!!!!! \n");
-                getStream(fp,B);
-                printf("HERE!!!!!!!!!!!!!! \n");
+                // printf("HERE!!!!!!!!!!!!!! \n");
+                // getStream(fp,B);
+                // printf("HERE!!!!!!!!!!!!!! \n");
                 tokenInfo token;
                 printf("Token List:\n");
                 printf("%-15s %-15s %-10s\n", "Token Name", "Lexeme", "Line Number");
                 while (1) {
-                    token = getNextToken(&B);
+                    token = getNextToken();
                     if (token.TOKEN_NAME == TK_ERR) {
                         break;
                     }
